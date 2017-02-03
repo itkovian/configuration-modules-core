@@ -1,10 +1,10 @@
-unique template metaconfig/logstash/config;
+unique template metaconfig/logstash/config_2.0;
 
-include 'metaconfig/logstash/schema';
+variable METACONFIG_LOGSTASH_VERSION = 2.0;
+
+include format('metaconfig/logstash/schema_%s', METACONFIG_LOGSTASH_VERSION);
 
 bind "/software/components/metaconfig/services/{/etc/logstash/conf.d/logstash.conf}/contents" = type_logstash;
-
-variable METACONFIG_LOGSTASH_VERSION ?= '1.2';
 
 prefix "/software/components/metaconfig/services/{/etc/logstash/conf.d/logstash.conf}";
 "daemons/logstash" = "restart";

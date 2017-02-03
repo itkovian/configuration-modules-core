@@ -1,10 +1,6 @@
-unique template metaconfig/logstash/forwarder;
+unique template metaconfig/logstash/forwarder_5.0;
 
-include metaconfig/logstash/version;
-
-include format("metaconfig/logstash/formatter_%s", METACONFIG_LOGSTASH_VERSION);
-
-include 'metaconfig/logstash/schema';
+include 'metaconfig/logstash/schema_5.0';
 
 bind "/software/components/metaconfig/services/{/etc/logstash-forwarder.conf}/contents" = type_logstash_forwarder;
 

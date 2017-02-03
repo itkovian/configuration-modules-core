@@ -1,4 +1,4 @@
-declaration template metaconfig/logstash/schema;
+declaration template metaconfig/logstash/schema_5.0;
 
 @{ Schema for logstash inputs, outputs and filters. See
 http://logstash.net/docs/1.2.2/ for all the details.
@@ -124,7 +124,6 @@ type logstash_input_beats = {
     include logstash_input_lumberjack
     'ssl_certificate_authorities' ? string[]
     'ssl' ? boolean
-    'congestion_threshold' ? long(0..)
 };
 
 type logstash_input_plugin = {

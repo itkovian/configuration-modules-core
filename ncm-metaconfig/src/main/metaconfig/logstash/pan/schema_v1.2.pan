@@ -1,4 +1,4 @@
-declaration template metaconfig/logstash/schema;
+declaration template metaconfig/logstash/schema_1.2;
 
 @{ Schema for logstash inputs, outputs and filters. See
 http://logstash.net/docs/1.2.2/ for all the details.
