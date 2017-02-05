@@ -1,1 +1,2 @@
-[%-# nothing needed -%]
+[%- INCLUDE "metaconfig/logstash/5.0/config/type.tt" type="extact" names=["congestion_threshold","port"] -%]
+[%- INCLUDE "metaconfig/logstash/5.0/config/type.tt" type="string" names=["host","ssl_certificate","ssl_key","ssl_key_passphrase"] -%]
