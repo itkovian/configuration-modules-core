@@ -5,7 +5,7 @@ object template config;
 
 include 'metaconfig/elasticsearch/config';
 
-prefix "/software/components/metaconfig/services/{/etc/elasticsearch/elasticsearch.yml}/contents/threadpool";
+prefix "/software/components/metaconfig/services/{/etc/elasticsearch/elasticsearch.yml}/contents/thread_pool";
 "bulk/size" = length(value("/hardware/cpu"));
 "bulk/type" = "fixed";
 "bulk/queue_size" = 500;
