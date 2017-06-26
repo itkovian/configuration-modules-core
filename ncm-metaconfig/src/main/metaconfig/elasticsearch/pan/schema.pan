@@ -117,7 +117,7 @@ type elasticsearch_service = {
     "indices" ? elasticsearch_indices
     "network" : elasticsearch_network = dict("host", "localhost")
     "monitor.jvm" : elasticsearch_monitoring = dict()
-    "threadpool" ? elasticsearch_threadpool
+    "thread_pool" ? elasticsearch_threadpool
     "bootstrap" ? elasticsearch_bootstrap
     "cluster" ? elasticsearch_cluster
     "transport" ? elasticsearch_transport
