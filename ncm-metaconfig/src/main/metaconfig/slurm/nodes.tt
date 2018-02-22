@@ -1,0 +1,6 @@
+[%- # node name is list of names or key
+    nodename = value.exists('NodeName') ? value.NodeName.join(',') : key;
+    value.delete('NodeName');
+-%]
+NodeName=[% nodename -%] [% -%]
+[%- INCLUDE 'metaconfig/slurm/params.tt' data=value -%]
