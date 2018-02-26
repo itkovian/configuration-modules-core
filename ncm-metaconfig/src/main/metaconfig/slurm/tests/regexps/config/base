@@ -34,7 +34,6 @@ MaxJobId=999999999
 MaxStepCount=40000
 MaxTasksPerNode=128
 MpiDefault=none
-PluginDir=/etc/slurm
 PrivateData=jobs,accounts,nodes,reservations,usage
 ProctrackType=proctrack/cgroup
 ReturnToService=1
@@ -53,8 +52,8 @@ NodeName=node1,node2 CPUs=8 CoresPerSocket=1 RealMemory=3500 Sockets=4 State=UP 
 
 # partitions
 
-PartitionName=banette Default DisableRootJobs MaxTime=4320 Nodes=ALL State=UP
-PartitionName=banette-debug MaxTime=4320 Nodes=node2801,node2802 State=DOWN
+PartitionName=thepartition Default=YES DisableRootJobs MaxTime=4320 Nodes=ALL State=UP
+PartitionName=thepartition-debug MaxTime=4320 Nodes=node2801,node2802 State=DOWN
 
 # priority
 
@@ -86,7 +85,7 @@ TaskPluginParam=sched
 DefMemPerCPU=123
 FastSchedule=1
 MaxMemPerNode=345
-SchedulerParameters=bf_continue bf_max_job_test=1024 bf_window=4320 default_queue_depth=128
+SchedulerParameters=bf_continue,bf_max_job_test=1024,bf_window=4320,default_queue_depth=128
 SchedulerType=sched/backfill
 SelectType=select/cons_res
 SelectTypeParameters=CR_Core_Memory
