@@ -1,0 +1,101 @@
+Config file for main slurm daemon
+---
+/etc/slurm/slurm.conf
+quote
+---
+
+# accounting
+
+AccountingStorageEnforce=accounting
+AccountingStorageHost=slurmdb.example.org
+AccountingStorageType=accounting_storage/slurmdbd
+AccountingStoreJobComment=YES
+ClusterName=thecluster
+JobAcctGatherFrequency=30
+JobAcctGatherType=jobacct_gather/cgroup
+JobCompLoc=/var/spool/slurm/job_completions.log
+JobCompType=jobcomp/filetxt
+
+# control
+
+AuthType=auth/munge
+ControlMachine=master.example.com
+CryptoType=crypto/munge
+DisableRootJobs=YES
+EnforcePartLimits=NO
+FirstJobId=1
+GroupUpdateForce=0
+GroupUpdateTime=600
+JobCheckpointDir=/var/spool/slurm/checkpoint
+JobSubmitPlugins=lua
+MailProg=/bin/mail
+MaxJobCount=5000
+MaxJobId=999999999
+MaxStepCount=40000
+MaxTasksPerNode=128
+MpiDefault=none
+PluginDir=/etc/slurm
+PrivateData=jobs,accounts,nodes,reservations,usage
+ProctrackType=proctrack/cgroup
+ReturnToService=1
+
+# logging
+
+SlurmctldDebug=3
+SlurmctldLogFile=/var/log/slurmctld
+SlurmdDebug=3
+SlurmdLogFile=/var/log/slurmd
+
+# nodes
+
+NodeName=DEFAULT CPUs=4 CoresPerSocket=1 RealMemory=3500 Sockets=4 State=UNKNOWN ThreadsPerCore=1
+NodeName=node1,node2 CPUs=8 CoresPerSocket=1 RealMemory=3500 Sockets=4 State=UP ThreadsPerCore=2
+
+# partitions
+
+PartitionName=banette Default DisableRootJobs MaxTime=4320 Nodes=ALL State=UP
+PartitionName=banette-debug MaxTime=4320 Nodes=node2801,node2802 State=DOWN
+
+# priority
+
+PriorityCalcPeriod=5
+PriorityDecayHalfLife=10080
+PriorityFavorSmall=NO
+PriorityFlags=FAIR_TREE
+PriorityMaxAge=40320
+PriorityType=priority/multifactor
+PriorityWeightAge=5000
+PriorityWeightFairshare=7000
+PriorityWeightJobSize=2500
+
+# process
+
+SlurmUser=slurm
+SlurmctldPidFile=/var/run/slurmctld.pid
+SlurmctldPort=6817
+SlurmdPidFile=/var/run/slurmd.pid
+SlurmdPort=6818
+SlurmdSpoolDir=/var/spool/slurm/slurmd
+StateSaveLocation=/var/spool/slurm
+SwitchType=switch/none
+TaskPlugin=task/affinity,task/cgroup
+TaskPluginParam=sched
+
+# scheduling
+
+DefMemPerCPU=123
+FastSchedule=1
+MaxMemPerNode=345
+SchedulerParameters=bf_continue bf_max_job_test=1024 bf_window=4320 default_queue_depth=128
+SchedulerType=sched/backfill
+SelectType=select/cons_res
+SelectTypeParameters=CR_Core_Memory
+
+# timers
+
+InactiveLimit=0
+KillWait=30
+MinJobAge=300
+SlurmctldTimeout=120
+SlurmdTimeout=300
+Waittime=0

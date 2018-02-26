@@ -8,4 +8,4 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}";
 "owner" = "root";
 "group" = "root";
 "mode" = 0644;
-"module" = "tiny";
+"module" = "slurm/config";
