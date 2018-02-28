@@ -10,12 +10,12 @@ include 'pan/types';
 type slurm_gres = {
     'name' : string
     'type' ? string
-    'no_consume' ? boolean
+    'consume' : boolean = true
     'number' : long(0..)
-    'suffix' ? choice('K', 'M', 'G', 'T', 'P')
 };
 
 
+@{all intervals in seconds}
 type slurm_job_gather_frequency = {
     'energy' ? long(0..)
     'filesystem' ? long(0..)
@@ -24,7 +24,8 @@ type slurm_job_gather_frequency = {
 };
 
 type slurm_msg_aggregation = {
-    'param' : string with match(SELF, '^(WindowMsgs|WindowTime)=\d+$')
+    'WindowMsgs' ? long(0..)
+    'WindowTime' ? long(0..)
 };
 
 type slurm_power_parameters = {
@@ -288,7 +289,8 @@ type slurm_conf_process = {
     'SlurmdUser' ? string
     'SlurmctldPidFile' ? absolute_file_path
     'SlurmctldPlugstack' ? string[]
-    'SlurmctldPort' ? string   # either a single port or a range
+    @{a port range}
+    'SlurmctldPort' ? long(0..)[] with {length(SELF) == 1 || length(SELF) == 2}
     'SlurmdPidFile' ? absolute_file_path
     'SlurmdPort' ? long(0..)
     'SlurmdSpoolDir' ? absolute_file_path
@@ -334,12 +336,15 @@ type slurm_conf_scheduling = {
 
 
 type slurm_conf_job_priority = {
-    'PriorityDecayHalfLife' ? string  # a slurm time string
-    'PriorityCalcPeriod' ? long(0..)  #minutes
+    @{in minutes}
+    'PriorityDecayHalfLife' ? long(0..)
+    @{in minutes}
+    'PriorityCalcPeriod' ? long(0..)
     'PriorityFavorSmall' ? boolean
     'PriorityFlags' ? choice( 'ACCRUE_ALWAYS', 'CALCULATE_RUNNING', 'DEPTH_OBLIVIOUS', 'FAIR_TREE', 'INCR_ONLY', 'MAX_TRES', 'SMALL_RELATIVE_TO_TIME' )[]
     'PriorityParameters' ? string
-    'PriorityMaxAge' ? string  # slurm time string
+    @{in minutes}
+    'PriorityMaxAge' ? long(0..)
     'PriorityUsageResetPeriod' ? choice( 'NONE', 'NOW', 'DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY')
     'PriorityType' ? choice("basic", "multifactor")
     'PriorityWeightAge' ? long(0..)
@@ -376,7 +381,7 @@ type slurm_conf_accounting = {
     'JobCompUser' ? string
 
     'JobAcctGatherType' ? choice("linux", "none", "cgroup")
-    'JobAcctGatherFrequency' ? slurm_job_gather_frequency[]
+    'JobAcctGatherFrequency' ? slurm_job_gather_frequency
     'JobAcctGatherParams' ? choice('NoShared',  'UsePss',  'NoOverMemoryKill')
 };
 
@@ -479,7 +484,8 @@ type slurm_conf_partition = {
     @{in megabytes}
     'MaxMemPerNode' ? long(0..)
     'MaxNodes' ? long(0..)
-    'MaxTime' ? string
+    @{in minutes}
+    'MaxTime' ? long(0..)
     'MinNodes' ? long(0..)
     'Nodes' ? string[]
     'OverSubscribe' ? choice('EXCLUSIVE', 'FORCE', 'YES', 'NO')
@@ -495,6 +501,15 @@ type slurm_conf_partition = {
     'TRESBillingWeights' ? dict()
 };
 
+type slurm_conf_nodes = {
+    @{key is used as nodename, unless NodeName attribute is set}
+    'compute' : slurm_conf_compute_nodes{}
+    @{key is used as nodename, unless DownNodes attribute is set}
+    'down'? slurm_conf_down_nodes{}
+    @{key is used as nodename, unless FrontendName attribute is set}
+    'frontend' ? slurm_conf_frontend_nodes{}
+};
+
 type slurm_conf = {
     'control' : slurm_conf_control
     'process' : slurm_conf_process
@@ -506,10 +521,7 @@ type slurm_conf = {
     'accounting' : slurm_conf_accounting
     'logging' : slurm_conf_logging
     'power' ? slurm_conf_power
-    @{key is used as nodename, unless NodeName attribute is set}
-    'nodes' : slurm_conf_compute_nodes{}
-    'down_nodes'? slurm_conf_down_nodes{}
-    'frontend_nodes' ? slurm_conf_frontend_nodes{}
+    'nodes' ? slurm_conf_nodes
     @{key is the PartitionName}
     'partitions' : slurm_conf_partition{}
 };

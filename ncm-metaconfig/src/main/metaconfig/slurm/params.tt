@@ -1,7 +1,21 @@
 [%-
     params = [];
     FOREACH param IN data.pairs;
-        IF param.value.is_boolean;
+        IF param.key == 'Gres';
+            allgres = [];
+            FOREACH gre IN param.value;
+                gres = [gre.name];
+                IF gre.defined('type');
+                    gres.push(gre.type);
+                END;
+                IF !gre.consume;
+                    gres.push('no_consume');
+                END;
+                gres.push(gre.number);
+                allgres.push(gres.join(':'));
+            END;
+            params.push(param.key _ '=' _ allgres.join(','));
+        ELSIF param.value.is_boolean;
             IF boolvalue;
                 params.push(param.key _ '=' _ (param.value ? 'YES' : 'NO'));
             ELSE;
@@ -11,6 +25,8 @@
             END;
         ELSIF CCM.is_list(param.value);
             params.push(param.key _ '=' _ param.value.join(','));
+        ELSIF param.value.is_string AND param.value.search('\s');
+            params.push(param.key _ '="' _ param.value _ '"');
         ELSE;
             params.push(param.key _ '=' _ param.value);
         END;
