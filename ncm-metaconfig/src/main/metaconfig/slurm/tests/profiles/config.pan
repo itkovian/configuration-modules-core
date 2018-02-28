@@ -34,7 +34,7 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/content
 "MaxTasksPerNode" = 128;
 "MpiDefault" = "none";
 #MpiParams=ports=#-#
-"PluginDir" = "/etc/slurm";
+#"PluginDir" = "/etc/slurm";
 #PlugStackConfig=
 "PrivateData" = list("jobs", "accounts", "nodes", "reservations", "usage");
 "ProctrackType" = "cgroup";
@@ -190,14 +190,14 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/content
 "ThreadsPerCore" = 2;
 "State" = "UP";
 
-prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/partitions/banette";
+prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/partitions/thepartition";
 "Nodes" = list('ALL');
 "Default" = true;
 "MaxTime" = 3*24*60;
 "State" = "UP";
 "DisableRootJobs" = true;
 
-prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/partitions/banette-debug";
+prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/partitions/thepartition-debug";
 "Nodes" = list('node2801','node2802');
 "MaxTime" = 3*24*60;
 "State" = "DOWN";

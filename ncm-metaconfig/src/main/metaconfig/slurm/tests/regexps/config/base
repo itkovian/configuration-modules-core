@@ -52,8 +52,8 @@ NodeName=node1,node2 CPUs=8 CoresPerSocket=1 RealMemory=3500 Sockets=4 State=UP 
 
 # partitions
 
-PartitionName=thepartition Default=YES DisableRootJobs MaxTime=4320 Nodes=ALL State=UP
-PartitionName=thepartition-debug MaxTime=4320 Nodes=node2801,node2802 State=DOWN
+PartitionName=thepartition Default=YES DisableRootJobs=YES MaxTime=4320 Nodes=ALL State=UP
+PartitionName=thepartition-debug DisableRootJobs=NO MaxTime=4320 Nodes=node2801,node2802 State=DOWN
 
 # priority
 
@@ -98,3 +98,4 @@ MinJobAge=300
 SlurmctldTimeout=120
 SlurmdTimeout=300
 Waittime=0
+
