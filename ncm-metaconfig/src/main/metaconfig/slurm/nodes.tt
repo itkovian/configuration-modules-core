@@ -3,4 +3,4 @@
     value.delete('NodeName');
 -%]
 NodeName=[% nodename -%] [% -%]
-[%- INCLUDE 'metaconfig/slurm/params.tt' data=value -%]
+[%- INCLUDE 'metaconfig/slurm/params.tt' data=value join=' ' -%]
