@@ -2,8 +2,12 @@
     params = [];
     FOREACH param IN data.pairs;
         IF param.value.is_boolean;
-            IF param.value;
-                params.push(param.key);
+            IF boolvalue;
+                params.push(param.key _ '=' _ (param.value ? 'YES' : 'NO'));
+            ELSE;
+                IF param.value;
+                    params.push(param.key);
+                END;
             END;
         ELSIF CCM.is_list(param.value);
             params.push(param.key _ '=' _ param.value.join(','));
@@ -12,4 +16,4 @@
         END;
     END;
 -%]
-[%- params.join(' ') -%]
+[%- params.join(join ? join : ',') -%]
