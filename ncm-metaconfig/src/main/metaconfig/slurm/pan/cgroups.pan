@@ -1,5 +1,6 @@
 unique template metaconfig/slurm/cgroups;
 
+include 'components/metaconfig/config';
 include 'metaconfig/slurm/schema';
 
 bind "/software/components/metaconfig/services/{/etc/slurm/cgroups.conf}/contents" = slurm_cgroups_conf;
@@ -9,3 +10,4 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/cgroups.conf}";
 "group" = "root";
 "mode" = 0644;
 "module" = "slurm/dbd";
+"daemons/slurmd" = "restart";

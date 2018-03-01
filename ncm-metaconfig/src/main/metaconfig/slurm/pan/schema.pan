@@ -7,15 +7,18 @@ https://slurm.schedmd.com
 
 include 'pan/types';
 
+type slurm_debuglevel = choice('quiet', 'fatal', 'error', 'info', 'verbose',
+    'debug', 'debug2', 'debug3', 'debug4', 'debug5');
+
 type slurm_gres = {
     'name' : string
     'type' ? string
-    'no_consume' ? boolean
+    'consume' : boolean = true
     'number' : long(0..)
-    'suffix' ? choice('K', 'M', 'G', 'T', 'P')
 };
 
 
+@{all intervals in seconds}
 type slurm_job_gather_frequency = {
     'energy' ? long(0..)
     'filesystem' ? long(0..)
@@ -24,7 +27,8 @@ type slurm_job_gather_frequency = {
 };
 
 type slurm_msg_aggregation = {
-    'param' : string with match(SELF, '^(WindowMsgs|WindowTime)=\d+$')
+    'WindowMsgs' ? long(0..)
+    'WindowTime' ? long(0..)
 };
 
 type slurm_power_parameters = {
@@ -148,7 +152,7 @@ type slurm_task_plugin_param = {
     'SlurmdOffSpec' ? boolean
     'Verbose' ? boolean
     'Autobind' ? boolean
-  };
+};
 
 type slurm_topology_param = {
     'Dragonfly' ? boolean
@@ -161,6 +165,26 @@ type slurm_conf_health_check = {
     'HealthCheckInterval' ? long(0..)
     'HealthCheckNodeState' ? choice('ALLOC', 'ANY', 'CYCLE', 'IDLE', 'MIXED')[]
     'HealthCheckProgram' ? absolute_file_path
+};
+
+
+type slurm_control_resourcelimits = choice( 'ALL', 'NONE', 'AS', 'CORE', 'CPU', 'DATA', 'FSIZE',
+    'MEMLOCK', 'NOFILE', 'NPROC', 'RSS', 'STACK');
+
+type slurm_mpi_params = {
+    @{port or port range}
+    'ports' ? long(0..)[] with {length(SELF) == 1 || length(SELF) == 2}
+};
+
+type slurm_launch_params = {
+    'batch_step_set_cpu_freq' ? boolean
+    'cray_net_exclusive' ? boolean
+    'lustre_no_flush' ? boolean
+    'mem_sort' ? boolean
+    'send_gids' ? boolean
+    'slurmstepd_memlock' ? boolean
+    'slurmstepd_memlock_all' ? boolean
+    'test_exec' ? boolean
 };
 
 type slurm_conf_control = {
@@ -181,7 +205,12 @@ type slurm_conf_control = {
     'CpuFreqDef' ? choice( 'Conservative', 'OnDemand', 'Performance', 'PowerSave')
     'CpuFreqGovernors' ? choice('Conservative', 'OnDemand', 'Performance', 'PowerSave', 'UserSpace')
     'CryptoType' ? choice("munge", "openssl")
-    'DebugFlags' ? choice( 'Backfill', 'BackfillMap', 'BGBlockAlgo', 'BGBlockAlgoDeep', 'BGBlockPick', 'BGBlockWires', 'BurstBuffer', 'CPU_Bind', 'CpuFrequency', 'DB_ASSOC', 'DB_EVENT', 'DB_JOB', 'DB_QOS', 'DB_QUERY', 'DB_RESERVATION', 'DB_RESOURCE', 'DB_STEP', 'DB_USAGE', 'DB_WCKEY', 'Elasticsearch', 'Energy', 'ExtSensors', 'Federation', 'FrontEnd', 'Gres', 'HeteroJobs', 'Gang', 'JobContainer', 'License', 'NodeFeatures', 'NO_CONF_HASH', 'Power', 'Priority', 'Profile', 'Protocol', 'Reservation', 'SelectType', 'Steps', 'Switch', 'TimeCray', 'TraceJobs', 'Triggers')[]
+    'DebugFlags' ? choice( 'Backfill', 'BackfillMap', 'BGBlockAlgo', 'BGBlockAlgoDeep', 'BGBlockPick',
+        'BGBlockWires', 'BurstBuffer', 'CPU_Bind', 'CpuFrequency', 'DB_ASSOC', 'DB_EVENT', 'DB_JOB', 'DB_QOS',
+        'DB_QUERY', 'DB_RESERVATION', 'DB_RESOURCE', 'DB_STEP', 'DB_USAGE', 'DB_WCKEY', 'Elasticsearch', 'Energy',
+        'ExtSensors', 'Federation', 'FrontEnd', 'Gres', 'HeteroJobs', 'Gang', 'JobContainer', 'License',
+        'NodeFeatures', 'NO_CONF_HASH', 'Power', 'Priority', 'Profile', 'Protocol', 'Reservation', 'SelectType',
+        'Steps', 'Switch', 'TimeCray', 'TraceJobs', 'Triggers')[]
 
     'DefaultStorageHost' ? string
     'DefaultStorageLoc' ? string
@@ -199,7 +228,7 @@ type slurm_conf_control = {
     'ExtSensorsType' ? choice('none', 'rrd')
     'FairShareDampeningFactor' ? long(1..)
     'FastSchedule' ? long(0..2)
-    'FederationParameters' ? string[]
+    'FederationParameters' ? dict
     'FirstJobId' ? long(0..)
     'GresTypes' ? string[]
     'GroupUpdateForce' ? boolean # 0/1
@@ -213,10 +242,11 @@ type slurm_conf_control = {
     'JobSubmitPlugins' ? choice('lua')
     'KillOnBadExit' ? boolean # 0/1
     'LaunchType' ? choice( 'aprun', 'poe', 'runjob', 'slurm')
-    'LaunchParameters' ? choice('batch_step_set_cpu_freq', 'cray_net_exclusive', 'lustre_no_flush', 'mem_sort', 'send_gids', 'slurmstepd_memlock', 'slurmstepd_memlock_all', 'test_exec')[]
+    'LaunchParameters' ? slurm_launch_params
     'Licenses' ? string[]
     'MailProg' ? absolute_file_path
-    'MaxArraySize' ? long(0..4000001) # 0 disables array jobs, The value of MaxJobCount should be much larger than MaxArraySize
+    @{0 disables array jobs, the value of MaxJobCount should be much larger than MaxArraySize}
+    'MaxArraySize' ? long(0..4000001)
     'MaxJobCount' ? long(0..200000)
     'MaxJobId' ? long(0..67108863)
     'MaxMemPerCPU' ? long(0..)
@@ -224,30 +254,30 @@ type slurm_conf_control = {
     'MaxStepCount' ? long(0..)
     'MaxTasksPerNode' ? long(0..65533)
     'MpiDefault' ? choice("openmpi", "pmi2", "pmix", "none")
-    'MpiParams' ? string with match(SELF, '^ports=\d+-\d+$')
+    'MpiParams' ? slurm_mpi_params
     'PluginDir' ? absolute_file_path[]  # colon-separated
     'PlugStackConfig' ? absolute_file_path  # defaults to plugstack.conf in the slurm conf dir
     'PreemptMode' ? choice('OFF', 'CANCEL', 'CHECKPOINT', 'GANG', 'REQUEUE', 'SUSPEND')
     'PreemptType' ? choice( 'none', 'partition_prio', 'qos')
-    'PrivateData' : string[]
     'ProctrackType' ? choice( 'cgroup', 'cray', 'linuxproc', 'lua', 'sgi_job', 'pgid')
     'PropagatePrioProcess' ? long(0..2)
-    'PropagateResourceLimits' ? choice( 'ALL', 'NONE', 'AS', 'CORE', 'CPU', 'DATA', 'FSIZE', 'MEMLOCK', 'NOFILE', 'NPROC', 'RSS', 'STACK')
-    'PropagateResourceLimitsExcept' ? choice( 'ALL', 'NONE', 'AS', 'CORE', 'CPU', 'DATA', 'FSIZE', 'MEMLOCK', 'NOFILE', 'NPROC', 'RSS', 'STACK')
+    'PropagateResourceLimits' ? slurm_control_resourcelimits
+    'PropagateResourceLimitsExcept' ? slurm_control_resourcelimits
     'RebootProgram' ? absolute_file_path
     'ReconfigFlags' ? choice( 'KeepPartInfo', 'KeepPartState')
-    'RequeueExit' ? string[]  # Separate multiple exit code by a comma and/or specify numeric ranges using a "-" separator
-    'RequeueExitHold' ? string[]  # Separate multiple exit code by a comma and/or specify numeric ranges using a "-" separator
-    @{nodes per minute}
-    @{in seconds}
-    'ReturnToService' : long
+    @{Separate multiple exit code, does not support ranges}
+    'RequeueExit' ? long[]
+    @{Separate multiple exit code, does not support ranges}
+    'RequeueExitHold' ? long[]
+    'ReturnToService' : long(0..2)
 
     'NodeFeaturesPlugins' ? choice('knl_cray', 'knl_generic')
     'MailDomain' ? string
     'MemLimitEnforce' ? boolean # yes/no
     'MinJobAge' ? long(0..)
-    'MsgAggregationParams' ? slurm_msg_aggregation[]
-    'PrivateData' ? choice('accounts', 'cloud', 'events', 'jobs', 'nodes', 'partitions', 'reservations', 'usage', 'users')[]
+    'MsgAggregationParams' ? slurm_msg_aggregation
+    'PrivateData' ? choice('accounts', 'cloud', 'events', 'jobs', 'nodes', 'partitions',
+        'reservations', 'usage', 'users')[]
     'RoutePlugin' ? choice("default", "topology")   # prefix=route/
     'SallocDefaultCommand' ? string
     'SbcastParameters' ? slurm_sbcast_parameters
@@ -269,7 +299,7 @@ type slurm_conf_prolog_epilog = {
     'PrologSlurmctld' ? absolute_file_path
     'ResvEpilog' ? absolute_file_path
     @{in minutes}
-    'ResvOverRun' ? long(0..65533)  # UNLIMITED is also supported.
+    'ResvOverRun' ? long(0..65533) # TODO: support UNLIMITED via -1 value
     'ResvProlog' ? absolute_file_path
     'SrunEpilog' ? absolute_file_path
     'SrunProlog' ? absolute_file_path
@@ -278,7 +308,7 @@ type slurm_conf_prolog_epilog = {
 };
 
 type slurm_conf_process = {
-    'MCSParameters' ? string[] # see https://slurm.schedmd.com/mcs.html
+    'MCSParameters' ? dict # see https://slurm.schedmd.com/mcs.html
     'MCSPlugin' ? choice( 'none', 'account', 'group', 'user')
 
     'PowerParameters' ? slurm_power_parameters
@@ -288,7 +318,8 @@ type slurm_conf_process = {
     'SlurmdUser' ? string
     'SlurmctldPidFile' ? absolute_file_path
     'SlurmctldPlugstack' ? string[]
-    'SlurmctldPort' ? string   # either a single port or a range
+    @{a port range}
+    'SlurmctldPort' ? long(0..)[] with {length(SELF) == 1 || length(SELF) == 2}
     'SlurmdPidFile' ? absolute_file_path
     'SlurmdPort' ? long(0..)
     'SlurmdSpoolDir' ? absolute_file_path
@@ -334,12 +365,16 @@ type slurm_conf_scheduling = {
 
 
 type slurm_conf_job_priority = {
-    'PriorityDecayHalfLife' ? string  # a slurm time string
-    'PriorityCalcPeriod' ? long(0..)  #minutes
+    @{in minutes}
+    'PriorityDecayHalfLife' ? long(0..)
+    @{in minutes}
+    'PriorityCalcPeriod' ? long(0..)
     'PriorityFavorSmall' ? boolean
-    'PriorityFlags' ? choice( 'ACCRUE_ALWAYS', 'CALCULATE_RUNNING', 'DEPTH_OBLIVIOUS', 'FAIR_TREE', 'INCR_ONLY', 'MAX_TRES', 'SMALL_RELATIVE_TO_TIME' )[]
-    'PriorityParameters' ? string
-    'PriorityMaxAge' ? string  # slurm time string
+    'PriorityFlags' ? choice( 'ACCRUE_ALWAYS', 'CALCULATE_RUNNING', 'DEPTH_OBLIVIOUS', 'FAIR_TREE',
+        'INCR_ONLY', 'MAX_TRES', 'SMALL_RELATIVE_TO_TIME' )[]
+    'PriorityParameters' ? dict
+    @{in minutes}
+    'PriorityMaxAge' ? long(0..)
     'PriorityUsageResetPeriod' ? choice( 'NONE', 'NOW', 'DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY')
     'PriorityType' ? choice("basic", "multifactor")
     'PriorityWeightAge' ? long(0..)
@@ -350,9 +385,16 @@ type slurm_conf_job_priority = {
     'PriorityWeightTRES' ? string[]   # key-value pairs
 };
 
+type slurm_job_gather_params = {
+    'NoShared' ? boolean
+    'UsePss' ? boolean
+    'NoOverMemoryKill' ? boolean
+};
+
 type slurm_conf_accounting = {
     'AccountingStorageBackupHost' ? string
-    'AccountingStorageEnforce' ? choice('associations', 'limits', 'nojobs', 'nosteps', 'qos', 'safe', 'wckeys', 'all')[]
+    'AccountingStorageEnforce' ? choice('associations', 'limits', 'nojobs', 'nosteps',
+        'qos', 'safe', 'wckeys', 'all')[]
     'AccountingStorageHost' ? string
     'AccountingStorageLoc' ? string
     'AccountingStoragePass' ? string
@@ -360,7 +402,7 @@ type slurm_conf_accounting = {
     'AccountingStorageTRES' ? string[]
     'AccountingStorageType' ? choice("filetxt", "none", "slurmdbd")
     'AccountingStorageUser' ? string
-    'AccountingStoreJobComment' ? boolean # YES/NO
+    'AccountingStoreJobComment' ? boolean
 
     'AcctGatherNodeFreq' ? long(0..) # for acct_gather_energy/rapl plugin set a value less than 300
     'AcctGatherEnergyType' ? choice('none', 'ipmi', 'rapl')
@@ -376,18 +418,18 @@ type slurm_conf_accounting = {
     'JobCompUser' ? string
 
     'JobAcctGatherType' ? choice("linux", "none", "cgroup")
-    'JobAcctGatherFrequency' ? slurm_job_gather_frequency[]
-    'JobAcctGatherParams' ? choice('NoShared',  'UsePss',  'NoOverMemoryKill')
+    'JobAcctGatherFrequency' ? slurm_job_gather_frequency
+    'JobAcctGatherParams' ? slurm_job_gather_params
 };
 
 type slurm_conf_logging = {
     'LogTimeFormat' ? choice("iso8601", "iso8601_ms", "rfc5424", "rfc5424_ms", "clock", "short", "thread_id")
-    'SlurmctldDebug' ? choice('quiet', 'fatal', 'error', 'info', 'verbose', 'debug', 'debug2', 'debug3', 'debug4', 'debug5')
+    'SlurmctldDebug' ? slurm_debuglevel
     'SlurmctldLogFile' ? absolute_file_path
-    'SlurmctldSyslogDebug' ? choice('quiet', 'fatal', 'error', 'info', 'verbose', 'debug', 'debug2', 'debug3', 'debug4', 'debug5')
-    'SlurmdDebug' ? choice('quiet', 'fatal', 'error', 'info', 'verbose', 'debug', 'debug2', 'debug3', 'debug4', 'debug5')
+    'SlurmctldSyslogDebug' ? slurm_debuglevel
+    'SlurmdDebug' ? slurm_debuglevel
     'SlurmdLogFile' ? absolute_file_path
-    'SlurmdSyslogDebug' ? choice( 'quiet', 'fatal', 'error', 'info', 'verbose', 'debug', 'debug2', 'debug3', 'debug4', 'debug5')
+    'SlurmdSyslogDebug' ? slurm_debuglevel
     'SlurmSchedLogFile' ? absolute_file_path
     'SlurmSchedLogLevel' ? long(0..1)
 };
@@ -452,6 +494,12 @@ type slurm_conf_frontend_nodes = {
     'State' ? choice('DOWN', 'DRAIN', 'FAIL', 'FAILING', 'UNKNOWN')
 };
 
+type slurm_select_type = {
+    'CR_Core' ? boolean
+    'CR_Core_Memory' ? boolean
+    'CR_Socket' ? boolean
+    'CR_Socket_Memory' ? boolean
+};
 
 type slurm_conf_partition = {
     'AllocNodes' ? string[]
@@ -479,7 +527,8 @@ type slurm_conf_partition = {
     @{in megabytes}
     'MaxMemPerNode' ? long(0..)
     'MaxNodes' ? long(0..)
-    'MaxTime' ? string
+    @{in minutes}
+    'MaxTime' ? long(0..)
     'MinNodes' ? long(0..)
     'Nodes' ? string[]
     'OverSubscribe' ? choice('EXCLUSIVE', 'FORCE', 'YES', 'NO')
@@ -490,9 +539,18 @@ type slurm_conf_partition = {
     'QOS' ? string
     'ReqResv' ? boolean
     'RootOnly' ? boolean
-    'SelectTypeParameters' ? choice('CR_Core', 'CR_Core_Memory', 'CR_Socket', 'CR_Socket_Memory')
+    'SelectTypeParameters' ? slurm_select_type
     'State' ? choice('UP', 'DOWN', 'DRAIN', 'INACTIVE')
-    'TRESBillingWeights' ? dict()
+    'TRESBillingWeights' ? dict
+};
+
+type slurm_conf_nodes = {
+    @{key is used as nodename, unless NodeName attribute is set}
+    'compute' : slurm_conf_compute_nodes{}
+    @{key is used as nodename, unless DownNodes attribute is set}
+    'down'? slurm_conf_down_nodes{}
+    @{key is used as nodename, unless FrontendName attribute is set}
+    'frontend' ? slurm_conf_frontend_nodes{}
 };
 
 type slurm_conf = {
@@ -506,10 +564,7 @@ type slurm_conf = {
     'accounting' : slurm_conf_accounting
     'logging' : slurm_conf_logging
     'power' ? slurm_conf_power
-    @{key is used as nodename, unless NodeName attribute is set}
-    'nodes' : slurm_conf_compute_nodes{}
-    'down_nodes'? slurm_conf_down_nodes{}
-    'frontend_nodes' ? slurm_conf_frontend_nodes{}
+    'nodes' ? slurm_conf_nodes
     @{key is the PartitionName}
     'partitions' : slurm_conf_partition{}
 };
@@ -567,10 +622,12 @@ type slurm_dbd_conf = {
     'DbdBackupHost' ? string
     'DbdAddr' ? string
     'DbdHost' ? string
-    'DbdPort' ? long(0..) # must be equal to the AccountingStoragePort parameter in the slurm.conf
-    'DebugFlags' ? choice('DB_ARCHIVE', 'DB_ASSOC', 'DB_EVENT', 'DB_JOB', 'DB_QOS', 'DB_QUERY', 'DB_RESERVATION', 'DB_RESOURCE', 'DB_STEP', 'DB_USAGE', 'DB_WCKEY', 'FEDERATION')[]
-    'DebugLevel' ? choice('quiet', 'fatal', 'error', 'info', 'verbose', 'debug', 'debug2', 'debug3', 'debug4', 'debug5')
-    'DebugLevelSyslog' ? choice('quiet', 'fatal', 'error', 'info', 'verbose', 'debug', 'debug2', 'debug3', 'debug4', 'debug5')
+    # TODO: must be equal to the AccountingStoragePort parameter in the slurm.conf
+    'DbdPort' ? long(0..)
+    'DebugFlags' ? choice('DB_ARCHIVE', 'DB_ASSOC', 'DB_EVENT', 'DB_JOB', 'DB_QOS', 'DB_QUERY', 'DB_RESERVATION',
+        'DB_RESOURCE', 'DB_STEP', 'DB_USAGE', 'DB_WCKEY', 'FEDERATION')[]
+    'DebugLevel' ? slurm_debuglevel
+    'DebugLevelSyslog' ? slurm_debuglevel
     'DefaultQOS' ? string
     'LogFile' ? absolute_file_path
     'LogTimeFormat' ? choice("iso8601", "iso8601_ms", "rfc5424", "rfc5424_ms", "clock", "short")

@@ -1,6 +1,0 @@
-[%- # frontend name is list of names or key
-    frontendname = value.exists('FrontendName') ? value.FrontendName.join(',') : key;
-    value.delete('FrontendName');
--%]
-FrontendName=[% frontendname %] [% -%]
-[%- INCLUDE 'metaconfig/slurm/params.tt' data=value -%]

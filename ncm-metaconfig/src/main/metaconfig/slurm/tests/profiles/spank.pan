@@ -1,12 +1,15 @@
-object template plugstack;
+object template spank;
 
-include 'metaconfig/slurm/plugstack';
+function pkg_repl = { null; };
+include 'metaconfig/slurm/spank';
+'/software/components/metaconfig/dependencies' = null;
+
 
 prefix "/software/components/metaconfig/services/{/etc/slurm/plugstack.conf}/contents/plugins/0";
-"path" = "/some/path";
+"plugin" = "/some/path";
 
 prefix "/software/components/metaconfig/services/{/etc/slurm/plugstack.conf}/contents/plugins/1";
-"path" = "/some/other/path";
+"plugin" = "/some/other/path";
 "arguments" = dict(
     "woohoo", true,
     "hello", "world"

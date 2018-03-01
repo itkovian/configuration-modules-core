@@ -1,6 +1,8 @@
 object template config;
 
+function pkg_repl = { null; };
 include 'metaconfig/slurm/config';
+'/software/components/metaconfig/dependencies' = null;
 
 prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/control";
 
@@ -10,14 +12,15 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/content
 #BackupAddr = ;
 "AuthType" = "munge";
 "CryptoType" = "munge";
+"ClusterName" = "thecluster";
 "DisableRootJobs" = true;
-"EnforcePartLimits" = false;
+"EnforcePartLimits" = 'NO';
 #Epilog=
 #EpilogSlurmctld=
 "FirstJobId" = 1;
-"MaxJobId" = 999999999;
+"MaxJobId" = 9999999;
 #GresTypes=
-"GroupUpdateForce" = 0;
+"GroupUpdateForce" = false;
 "GroupUpdateTime" = 600;
 "JobCheckpointDir" = "/var/spool/slurm/checkpoint";
 #JobCredentialPrivateKey=
@@ -32,6 +35,7 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/content
 "MaxJobCount" = 5000;
 "MaxStepCount" = 40000;
 "MaxTasksPerNode" = 128;
+"MinJobAge" = 300;
 "MpiDefault" = "none";
 #MpiParams=ports=#-#
 #"PluginDir" = "/etc/slurm";
@@ -52,7 +56,7 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/content
 prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/process";
 
 "SlurmctldPidFile" = "/var/run/slurmctld.pid";
-"SlurmctldPort" = 6817;
+"SlurmctldPort" = list(6817);
 "SlurmdPidFile" = "/var/run/slurmd.pid";
 "SlurmdPort" = 6818;
 "SlurmdSpoolDir" = "/var/spool/slurm/slurmd";
@@ -64,7 +68,7 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/content
 "SwitchType" = "none";
 #TaskEpilog=
 "TaskPlugin" = list("affinity" , "cgroup");
-"TaskPluginParam" = dict("sched", true);
+"TaskPluginParam" = dict("Sched", true);
 #TaskProlog=
 #TopologyPlugin=topology/tree
 #TmpFS=/tmp
@@ -86,13 +90,12 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/content
 "KillWait" = 30;
 #MessageTimeout=10
 #ResvOverRun=0
-"MinJobAge" = 300;
 #OverTimeLimit=0
 "SlurmctldTimeout" = 120;
 "SlurmdTimeout" = 300;
 #UnkillableStepTimeout=60
 #VSizeFactor=0
-"Waittime" = 0;
+"WaitTime" = 0;
 
 
 prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/scheduling";
@@ -129,7 +132,7 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/content
 
 prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/accounting";
 
-"AccountingStorageEnforce" = list("accounting");
+"AccountingStorageEnforce" = list("qos", "safe");
 "AccountingStorageHost" = 'slurmdb.example.org';
 #AccountingStorageLoc = "/var/spool/slurm/job_accounting.log";"
 #AccountingStoragePass=
@@ -137,7 +140,6 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/content
 "AccountingStorageType" = "slurmdbd";
 #AccountingStorageUser=
 "AccountingStoreJobComment" = true;
-"ClusterName" = "thecluster";
 #DebugFlags=
 #JobCompHost=
 "JobCompLoc" = "/var/spool/slurm/job_completions.log";
@@ -146,15 +148,18 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/content
 "JobCompType" = "filetxt";
 #JobCompUser=
 #JobContainerType=job_container/none
-"JobAcctGatherFrequency" = 30;
+"JobAcctGatherFrequency" = dict(
+    "network", 30,
+    "energy", 10,
+    );
 "JobAcctGatherType" = "cgroup";
 
 
 prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/logging";
 
-"SlurmctldDebug" = 3;
+"SlurmctldDebug" = "debug3";
 "SlurmctldLogFile" = "/var/log/slurmctld";
-"SlurmdDebug" = 3;
+"SlurmdDebug" = "debug4";
 "SlurmdLogFile" = "/var/log/slurmd";
 #SlurmdLogFile=
 #SlurmSchedLogFile=
@@ -173,7 +178,7 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/content
 #SuspendTime=
 
 
-prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/nodes/DEFAULT";
+prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/nodes/compute/DEFAULT";
 "CPUs" = 4;
 "RealMemory" = 3500;
 "Sockets" = 4;
@@ -181,14 +186,47 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/content
 "ThreadsPerCore" = 1;
 "State" = "UNKNOWN";
 
-prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/nodes/compute";
+prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/nodes/compute/compute";
 "NodeName" = list("node1", "node2");
 "CPUs" = 8;
 "RealMemory" = 3500;
 "Sockets" = 4;
 "CoresPerSocket" = 1;
 "ThreadsPerCore" = 2;
-"State" = "UP";
+"State" = "UNKNOWN";
+"Gres/0" = dict(
+    "name", "gpu",
+    "type", "kepler1",
+    "number", 1,
+    );
+"Gres/1" = dict(
+    "name", "gpu",
+    "type", "tesla1",
+    "number", 1,
+    );
+"Gres/2" = dict(
+    "name", "bandwidth",
+    "type", "lustre",
+    "consume", false,
+    "number", 4 * 1024 * 1024,
+    );
+
+prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/nodes/down/DEFAULT";
+"State" = "FAIL";
+
+prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/nodes/down/kaputt";
+"DownNodes" = list("node8", "node9");
+"State" = "FAILING";
+"Reason" = "in progress";
+
+prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/nodes/frontend/DEFAULT";
+"State" = "UNKNOWN";
+"AllowUsers" = list("usera", "userb");
+
+prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/nodes/frontend/special";
+"FrontendName" = list("login1", "login2");
+"State" = "FAILING";
+"Reason" = "in progress";
 
 prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/partitions/thepartition";
 "Nodes" = list('ALL');
