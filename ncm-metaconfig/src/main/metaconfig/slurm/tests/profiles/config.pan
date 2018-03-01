@@ -1,6 +1,8 @@
 object template config;
 
+function pkg_repl = { null; };
 include 'metaconfig/slurm/config';
+'/software/components/metaconfig/dependencies' = null;
 
 prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/contents/control";
 

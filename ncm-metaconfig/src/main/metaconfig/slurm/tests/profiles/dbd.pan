@@ -1,6 +1,9 @@
 object template dbd;
 
+function pkg_repl = { null; };
 include 'metaconfig/slurm/dbd';
+'/software/components/metaconfig/dependencies' = null;
+
 
 prefix "/software/components/metaconfig/services/{/etc/slurm/slurmdbd.conf}/contents";
 

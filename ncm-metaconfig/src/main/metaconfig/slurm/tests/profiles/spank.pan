@@ -1,6 +1,9 @@
 object template spank;
 
+function pkg_repl = { null; };
 include 'metaconfig/slurm/spank';
+'/software/components/metaconfig/dependencies' = null;
+
 
 prefix "/software/components/metaconfig/services/{/etc/slurm/plugstack.conf}/contents/plugins/0";
 "plugin" = "/some/path";
