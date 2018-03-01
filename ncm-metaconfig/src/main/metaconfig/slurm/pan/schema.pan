@@ -494,7 +494,7 @@ type slurm_conf_frontend_nodes = {
     'State' ? choice('DOWN', 'DRAIN', 'FAIL', 'FAILING', 'UNKNOWN')
 };
 
-type slurm_select_type = {
+type slurm_partition_select_type = {
     'CR_Core' ? boolean
     'CR_Core_Memory' ? boolean
     'CR_Socket' ? boolean
@@ -539,7 +539,7 @@ type slurm_conf_partition = {
     'QOS' ? string
     'ReqResv' ? boolean
     'RootOnly' ? boolean
-    'SelectTypeParameters' ? slurm_select_type
+    'SelectTypeParameters' ? slurm_partition_select_type
     'State' ? choice('UP', 'DOWN', 'DRAIN', 'INACTIVE')
     'TRESBillingWeights' ? dict
 };
