@@ -239,7 +239,7 @@ type slurm_conf_control = {
     'JobCredentialPublicCertificate' ? absolute_file_path
     'JobFileAppend' ? boolean # 0/1
     'JobRequeue' ? boolean # 0/1
-    'JobSubmitPlugins' ? choice('lua')
+    'JobSubmitPlugins' ? choice('lua', 'pbs', 'all_partitions', 'require_timelimit', 'throttle')[]
     'KillOnBadExit' ? boolean # 0/1
     'LaunchType' ? choice( 'aprun', 'poe', 'runjob', 'slurm')
     'LaunchParameters' ? slurm_launch_params
