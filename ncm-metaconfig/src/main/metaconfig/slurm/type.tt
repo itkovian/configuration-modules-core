@@ -6,7 +6,7 @@
         JobAcctGather = 'jobacct_gather'
         JobComp = 'jobcomp'
         Scheduler = 'sched'
-        Storage = 'accouting_storage' # from dbd
+        Storage = 'accounting_storage' # from dbd
     };
     IF shortname == 'DefaultStorage';
         prefix = '';
