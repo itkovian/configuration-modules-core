@@ -4,7 +4,7 @@ function pkg_repl = { null; };
 include 'metaconfig/slurm/cgroups';
 '/software/components/metaconfig/dependencies' = null;
 
-prefix "/software/components/metaconfig/services/{/etc/slurm/cgroups.conf}/contents";
+prefix "/software/components/metaconfig/services/{/etc/slurm/cgroup.conf}/contents";
 'CgroupAutomount' = true;
 
 'ConstrainCores' = true;
