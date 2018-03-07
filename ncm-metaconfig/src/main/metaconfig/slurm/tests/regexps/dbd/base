@@ -26,5 +26,5 @@ PurgeTXNAfter=8640hours
 PurgeUsageAfter=17280hours
 SlurmUser=slurm
 StoragePass=huppelde
-StorageType=accouting_storage/mysql
+StorageType=accounting_storage/mysql
 StorageUser=slurmdbd
