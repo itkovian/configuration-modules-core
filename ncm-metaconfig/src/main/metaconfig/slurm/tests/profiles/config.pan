@@ -27,7 +27,7 @@ prefix "/software/components/metaconfig/services/{/etc/slurm/slurm.conf}/content
 #JobCredentialPublicCertificate=
 #JobFileAppend=0
 #JobRequeue=1
-"JobSubmitPlugins" = "lua";
+"JobSubmitPlugins" = list("lua", "pbs)";
 #KillOnBadExit=0
 #LaunchType=launch/slurm
 #Licenses=foo*4,bar
