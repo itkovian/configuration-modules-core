@@ -1,6 +1,6 @@
 Config file for slurm cgroups
 ---
-/etc/slurm/cgroups.conf
+/etc/slurm/cgroup.conf
 quote
 ---
 
