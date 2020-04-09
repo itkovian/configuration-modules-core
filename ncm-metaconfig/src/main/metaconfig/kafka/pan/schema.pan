@@ -7,13 +7,13 @@ type kafka_server_properties = {
     "advertised.host.name" ? string
     "advertised.listeners" ? string = "PLAINTEXT://localhost:9092"
     "advertised.port" ? long(0..)
-    "auto.create.topics.enable" ? boolean
-    "auto.leader.rebalance.enable" ? boolean
+    "auto.create.topics.enable" ? choice("true", "false")
+    "auto.leader.rebalance.enable" ? choice("true", "false")
     "background.threads" ? long(1..)
     "broker.id" : long(0..)
     "compression.type" ? string
     "control.plane.listener.name" ? string
-    "delete.topic.enable" ? boolean
+    "delete.topic.enable" ? choice("true", "false")
     "host.name" ? string
     "leader.imbalance.check.interval.seconds" ? long(0..)
     "leader.imbalance.per.broker.percentage" ? long(0..)
@@ -73,16 +73,16 @@ type kafka_server_properties = {
     "transaction.state.log.replication.factor" ? long(1..)
     "transaction.state.log.segment.bytes" ? long(1..)
     "transactional.id.expiration.ms" ? long(1..)
-    "unclean.leader.election.enable" ? boolean
+    "unclean.leader.election.enable" ? choice("true", "false")
     "zookeeper.connection.timeout.ms" ? long(100..)
     "zookeeper.max.in.flight.requests" ? long(1..)
     "zookeeper.session.timeout.ms" ? long(0..)
     "zookeeper.set.acl" ? boolean
-    "broker.id.generation.enable" ? boolean
+    "broker.id.generation.enable" ? choice("true", "false")
     "broker.rack" ? string
     "connections.max.idle.ms" ? long(0..)
     "connections.max.reauth.ms" ? long(0..)
-    "controlled.shutdown.enable" ? boolean
+    "controlled.shutdown.enable" ? choice("true", "false")
     "controlled.shutdown.max.retries" ? long(0..)
     "controlled.shutdown.retry.backoff.ms" ? long(0..)
     "controller.socket.timeout.ms" ? long(0..)
@@ -101,7 +101,7 @@ type kafka_server_properties = {
     "log.cleaner.backoff.ms" ? long(0..)
     "log.cleaner.dedupe.buffer.size" ? long(0..)
     "log.cleaner.delete.retention.ms" ? long(0..)
-    "log.cleaner.enable" ? boolean
+    "log.cleaner.enable" ? choice("true", "false")
     "log.cleaner.io.buffer.load.factor" ? double
     "log.cleaner.io.buffer.size" ? long(0..)
     "log.cleaner.io.max.bytes.per.second" ? double
@@ -175,7 +175,7 @@ type kafka_server_properties = {
     "kafka.metrics.polling.interval.secs" ? long(1..)
     "kafka.metrics.reporters" ? string[]
     "listener.security.protocol.map" ? string
-    "log.message.downconversion.enable" ? boolean
+    "log.message.downconversion.enable" ? choice("true", "false")
     "metric.reporters" ? string[]
     "metrics.num.samples" ? long(1..)
     "metrics.recording.level" ? string
